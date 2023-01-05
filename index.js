@@ -45,6 +45,25 @@ async function run() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         })
+        // mark as seller when login as seller
+        app.put('/users/seller/:email', async(req, res)=>{  
+            const email=req.params.email
+            const filter={email}
+            const user = await usersCollection.findOne(filter);
+            if (user?.usage) {
+                return 
+            }else{
+                const options ={upsert:true}
+                const updatedDoc={
+                    $set:{
+                        usage:'seller'
+                    }   
+                }
+                const result= await usersCollection.updateOne(filter, updatedDoc, options )
+                res.send(result)
+            }
+            
+        })
     }
     finally{
 
