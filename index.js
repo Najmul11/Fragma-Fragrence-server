@@ -29,6 +29,7 @@ async function run() {
     try{
         // collections
         const qnaCollection=client.db('Product-resale').collection('qna')
+        const usersCollection=client.db('Product-resale').collection('users')
 
 
         
@@ -36,6 +37,13 @@ async function run() {
             const query={}
             const result=await qnaCollection.find(query).toArray()
             res.send(result)
+        })
+
+        // store users
+        app.post('/users', async (req, res) =>{
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+            res.send(result);
         })
     }
     finally{
