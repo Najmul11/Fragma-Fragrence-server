@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 
@@ -82,6 +82,28 @@ async function run() {
             }  
         })
 
+        // get all buyers/users 
+        app.get('/users', async(req, res)=>{
+            const query={ role: null, usage:null }
+            const result=await usersCollection.find(query).toArray()
+            console.log(result);
+            res.send(result)
+        })
+        // get all sellers only
+        app.get('/sellers', async(req, res)=>{
+            const query={ role: null, usage:'seller' }
+            const result=await usersCollection.find(query).toArray()
+            console.log(result);
+            res.send(result)
+        })
+
+         // delete buyer/seller in  
+         app.delete('/users/:id', async(req, res)=>{
+            const id= req.params.id
+            const filter= {_id:ObjectId(id)}
+            const result =await usersCollection.deleteOne(filter)
+            res.send(result)
+        })
 
     }
     finally{
