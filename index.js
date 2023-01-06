@@ -46,7 +46,7 @@ async function run() {
             res.send(result);
         })
         // mark as seller when login as seller
-        app.put('/users/seller/:email', async(req, res)=>{  
+        app.put('/users/usertype/:email', async(req, res)=>{  
             const email=req.params.email
             const filter={email}
             const user = await usersCollection.findOne(filter);
@@ -61,9 +61,22 @@ async function run() {
                 }
                 const result= await usersCollection.updateOne(filter, updatedDoc, options )
                 res.send(result)
-            }
-            
+            }    
         })
+        // check seller or admin  by email to give access as seller or as admin
+        app.get('/users/usertype/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            if (user?.role) {
+                res.send({ isAdmin: user?.role === 'admin' });
+            }
+            if (user?.usage) {
+                res.send({ isSeller: user?.usage === 'seller' });
+            }
+        })
+
+
     }
     finally{
 
