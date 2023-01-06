@@ -68,12 +68,18 @@ async function run() {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
-            if (user?.role) {
-                res.send({ isAdmin: user?.role === 'admin' });
-            }
-            if (user?.usage) {
-                res.send({ isSeller: user?.usage === 'seller' });
-            }
+
+            if (user?.role && user?.usage) {
+                res.send({ isAdmin: user?.role === 'admin', isSeller:  user?.usage === 'seller'});
+            }else{
+                if (user?.role) {
+                    res.send({ isAdmin: user?.role === 'admin' });
+                }else{
+                    if (user?.usage) {
+                        res.send({ isSeller: user?.usage === 'seller' });
+                    }
+                }       
+            }  
         })
 
 
