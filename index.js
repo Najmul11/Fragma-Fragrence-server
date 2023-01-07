@@ -127,6 +127,21 @@ async function run() {
             res.send(result)
         })
 
+        // post product from add product page
+        app.post('/products', async (req, res) =>{
+            const product = req.body;
+
+            const query={categoryName:product.categoryName}
+            const findCategory=await categoryCollection.findOne(query)
+            const categoryId=findCategory._id.toString()
+
+            product.categoryId=categoryId
+            product.status='unsold'
+            console.log(product);
+            const result = await productsCollection.insertOne(product);
+            res.send(result);
+        }) 
+
         // post order 
 
         app.post('/bookings', async (req, res) =>{
