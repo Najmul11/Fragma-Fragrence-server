@@ -30,6 +30,9 @@ async function run() {
         // collections
         const qnaCollection=client.db('Product-resale').collection('qna')
         const usersCollection=client.db('Product-resale').collection('users')
+        const categoryCollection=client.db('Product-resale').collection('category')
+        const productsCollection=client.db('Product-resale').collection('products')
+        const bookingCollection=client.db('Product-resale').collection('booking')
 
 
         
@@ -45,6 +48,7 @@ async function run() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         })
+        
         // mark as seller when login as seller
         app.put('/users/usertype/:email', async(req, res)=>{  
             const email=req.params.email
@@ -63,6 +67,7 @@ async function run() {
                 res.send(result)
             }    
         })
+
         // check seller or admin  by email to give access as seller or as admin
         app.get('/users/usertype/:email', async (req, res) => {
             const email = req.params.email;
@@ -89,21 +94,47 @@ async function run() {
             console.log(result);
             res.send(result)
         })
+
         // get all sellers only
         app.get('/sellers', async(req, res)=>{
             const query={ role: null, usage:'seller' }
             const result=await usersCollection.find(query).toArray()
-            console.log(result);
             res.send(result)
         })
 
-         // delete buyer/seller in  
+         // delete buyer/seller as admin
          app.delete('/users/:id', async(req, res)=>{
             const id= req.params.id
             const filter= {_id:ObjectId(id)}
             const result =await usersCollection.deleteOne(filter)
             res.send(result)
         })
+
+
+        // get categories to diplay in homepage
+        app.get('/categories', async(req, res)=>{
+            const query={}
+            const result=await categoryCollection.find(query).toArray()
+            res.send(result)
+        })
+
+
+        // get categoryWise products
+        app.get('/categories/:id', async(req, res)=>{
+            const id=req.params.id
+            const query={categoryId:id}
+            const result=await productsCollection.find(query).toArray()
+            res.send(result)
+        })
+
+        // post order 
+
+        app.post('/bookings', async (req, res) =>{
+            const booking = req.body;
+            const result = await bookingCollection.insertOne(booking);
+            res.send(result);
+        })
+
 
     }
     finally{
