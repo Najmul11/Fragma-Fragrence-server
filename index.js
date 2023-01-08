@@ -91,7 +91,6 @@ async function run() {
         app.get('/users', async(req, res)=>{
             const query={ role: null, usage:null }
             const result=await usersCollection.find(query).toArray()
-            console.log(result);
             res.send(result)
         })
 
@@ -118,6 +117,24 @@ async function run() {
             res.send(result)
         })
 
+         // get seller specific products and all products
+         app.get('/products', async(req, res)=>{
+            let query={}
+            if (req.query.email) {
+                query={sellerEmail:req.query.email}
+            }
+            const result=await productsCollection.find(query).toArray()
+            res.send(result)
+        })
+
+          // delete a product as seller 
+          app.delete('/products/:id', async(req, res)=>{
+            const id= req.params.id
+            const filter= {_id:ObjectId(id)}
+            const result =await productsCollection.deleteOne(filter)
+            res.send(result)
+        }) 
+ 
 
         // get categoryWise products
         app.get('/categories/:id', async(req, res)=>{
@@ -126,6 +143,8 @@ async function run() {
             const result=await productsCollection.find(query).toArray()
             res.send(result)
         })
+
+        
 
         // post product from add product page
         app.post('/products', async (req, res) =>{
@@ -137,7 +156,7 @@ async function run() {
 
             product.categoryId=categoryId
             product.status='unsold'
-            console.log(product);
+
             const result = await productsCollection.insertOne(product);
             res.send(result);
         }) 
@@ -157,3 +176,5 @@ async function run() {
     }  
 }
 run().catch(e=>{console.error(e)})
+ 
+
