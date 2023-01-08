@@ -116,6 +116,13 @@ async function run() {
             const result=await categoryCollection.find(query).toArray()
             res.send(result)
         })
+        app.get('/category/:id', async(req, res)=>{
+            const id=req.params.id
+            const query={_id:ObjectId(id)}
+            const result=await categoryCollection.findOne(query)
+            res.send(result)
+        })
+
 
          // get seller specific products and all products
          app.get('/products', async(req, res)=>{
