@@ -34,6 +34,8 @@ async function run() {
         const productsCollection=client.db('Product-resale').collection('products')
         const bookingCollection=client.db('Product-resale').collection('booking')
         const wishListCollection=client.db('Product-resale').collection('wishList')
+        const advertisedProductCollection=client.db('Product-resale').collection('advertisedProducts')
+
 
 
 
@@ -145,6 +147,14 @@ async function run() {
             res.send(result)
         })
 
+        // get orders by user email
+        app.get('/orders', async(req, res)=>{
+            const email=req.query.email
+            const query={buyerEmail:email}
+            const result=await bookingCollection.find(query).toArray()
+            res.send(result)
+        })
+
 
          // get seller specific products and all products
          app.get('/products', async(req, res)=>{
@@ -163,6 +173,21 @@ async function run() {
             const result =await productsCollection.deleteOne(filter)
             res.send(result)
         }) 
+
+
+        //add product for advertise avertise 
+        app.post('/advertisedproducts', async (req, res) =>{
+            const prod = req.body;
+            const result = await advertisedProductCollection.insertOne(prod);
+            res.send(result);
+        })
+
+        app.get('/advertisedproducts', async(req, res)=>{
+            const query={}
+            const result=await advertisedProductCollection.find(query).toArray()
+            res.send(result)
+        })
+
  
 
         // get categoryWise products
