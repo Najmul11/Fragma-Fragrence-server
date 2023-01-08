@@ -33,6 +33,8 @@ async function run() {
         const categoryCollection=client.db('Product-resale').collection('category')
         const productsCollection=client.db('Product-resale').collection('products')
         const bookingCollection=client.db('Product-resale').collection('booking')
+        const wishListCollection=client.db('Product-resale').collection('wishList')
+
 
 
         
@@ -60,13 +62,15 @@ async function run() {
                 const options ={upsert:true}
                 const updatedDoc={
                     $set:{
-                        usage:'seller'
+                        usage:'seller',
+                        status:'unverified'
                     }   
                 }
                 const result= await usersCollection.updateOne(filter, updatedDoc, options )
                 res.send(result)
             }    
         })
+
 
         // check seller or admin  by email to give access as seller or as admin
         app.get('/users/usertype/:email', async (req, res) => {
@@ -101,6 +105,23 @@ async function run() {
             res.send(result)
         })
 
+         // verify the seller as admin
+         app.put('/verifyseller/:email', async(req, res)=>{  
+            const email=req.params.email
+            const filter={email}
+
+            const options ={upsert:true}
+            const updatedDoc={
+                $set:{
+                    status:'verified'
+                }   
+            }
+        
+            const result= await usersCollection.updateOne(filter, updatedDoc, options )
+            res.send(result)
+               
+        })
+
          // delete buyer/seller as admin
          app.delete('/users/:id', async(req, res)=>{
             const id= req.params.id
@@ -116,6 +137,7 @@ async function run() {
             const result=await categoryCollection.find(query).toArray()
             res.send(result)
         })
+        // to show category name on category/:id route 
         app.get('/category/:id', async(req, res)=>{
             const id=req.params.id
             const query={_id:ObjectId(id)}
@@ -161,8 +183,14 @@ async function run() {
             const findCategory=await categoryCollection.findOne(query)
             const categoryId=findCategory._id.toString()
 
+
+            const query2={email:product.sellerEmail}
+            const findStatus= await usersCollection.findOne(query2)
+            const status=findStatus.status
+
             product.categoryId=categoryId
             product.status='unsold'
+            product.sellerStatus=status
 
             const result = await productsCollection.insertOne(product);
             res.send(result);
@@ -176,6 +204,20 @@ async function run() {
             res.send(result);
         })
 
+        // add wish
+        app.post('/wishlists', async (req, res) =>{
+            const wish = req.body;
+            const result = await wishListCollection.insertOne(wish);
+            res.send(result);
+        })
+        
+        // get wishlist 
+        app.get('/wishlists/:email', async(req, res)=>{
+            const email=req.params.email
+            const query={buyerEmail:email}
+            const result=await wishListCollection.find(query).toArray()
+            res.send(result)
+        })
 
     }
     finally{
